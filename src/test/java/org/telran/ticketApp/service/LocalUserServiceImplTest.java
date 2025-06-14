@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,8 +35,8 @@ class LocalUserServiceImplTest {
     static LocalUser localUser2;
     static LocalUser localUser3;
 
-    @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void init() {
         localUser1 = new LocalUser(
                 1L,
                 "Hans",
@@ -111,6 +112,8 @@ class LocalUserServiceImplTest {
     @Test
     void update() {
         LocalUser localUserExpected = localUser1;
+        localUserExpected.setEmail("hans.mueller25@example.de");
+        localUserExpected.setPassword("password_1_new");
 
         when(localUserRepositoryMock.save(localUserExpected)).thenReturn(localUserExpected);
 

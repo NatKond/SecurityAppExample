@@ -34,4 +34,9 @@ public class LocalUserController {
     public ResponseEntity<LocalUser> updateLocalUser(@RequestBody LocalUser localUser) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(localUserService.update(localUser));
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteLocalUser(@PathVariable Long id) {
+        localUserService.deleteById(id);
+    }
 }

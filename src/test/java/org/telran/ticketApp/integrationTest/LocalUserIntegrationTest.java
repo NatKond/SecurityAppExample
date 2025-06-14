@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,17 +21,18 @@ import org.telran.ticketApp.repository.LocalUserRepository;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasItems;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
+//@TestPropertySource("classpath:application-test.properties")
 //@DirtiesContext
+@ActiveProfiles("test")
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 public class LocalUserIntegrationTest {
     @Autowired
@@ -47,8 +49,6 @@ public class LocalUserIntegrationTest {
     static LocalUser localUser2;
     static LocalUser localUser3;
 
-    //    @BeforeAll
-//    static void setUp() {
     @BeforeEach
     void init() {
         localUser1 = new LocalUser(
@@ -80,12 +80,10 @@ public class LocalUserIntegrationTest {
                 "password_3",
                 "Via Roma 1, 00100 Roma, Italy"
         );
+
+        //        localUserRepository.saveAll(List.of(localUser1, localUser2, localUser3));
     }
-//    @BeforeEach
-//    void init() {
-//        localUserRepository.saveAll(List.of(localUser1, localUser2, localUser3));
-//    }
-//
+
 //    @AfterEach
 //    void tearDown() {
 //        localUserRepository.deleteAll(List.of(localUser1, localUser2, localUser3));
@@ -93,7 +91,7 @@ public class LocalUserIntegrationTest {
 
 
     @Test
-    void findAll() throws Exception {
+    void findAllIntegrationTest() throws Exception {
         List<LocalUser> localUserListExpected = List.of(localUser1, localUser2, localUser3);
 
         //when(localUserRepositoryMock.findAll()).thenReturn(localUserListExpected);
@@ -101,14 +99,37 @@ public class LocalUserIntegrationTest {
                 .andDo(print())
                 .andExpectAll(
                         status().isOk(),
-                        content().json(objectMapper.writeValueAsString(localUserListExpected))
-                );
+                        jsonPath("$[*].id", hasItems(
+                                localUser1.getId().intValue(),
+                                localUser2.getId().intValue(),
+                                localUser3.getId().intValue())),
+                        jsonPath("$[*].name", hasItems(
+                                localUser1.getName(),
+                                localUser1.getName(),
+                                localUser2.getName())),
+                        jsonPath("$[*].surname", hasItems(
+                                localUser1.getSurname(),
+                                localUser1.getSurname(),
+                                localUser2.getSurname())),
+                        jsonPath("$[*].email", hasItems(
+                                localUser1.getEmail(),
+                                localUser1.getEmail(),
+                                localUser2.getEmail())),
+                        jsonPath("$[*].password", hasItems(
+                                localUser1.getPassword(),
+                                localUser1.getPassword(),
+                                localUser2.getPassword())),
+                        jsonPath("$[*].postAddress", hasItems(
+                                localUser1.getPostAddress(),
+                                localUser1.getPostAddress(),
+                                localUser2.getPostAddress()
+                        )));
 
         //verify(localUserRepositoryMock).findAll();
     }
 
     @Test
-    void findById() throws Exception {
+    void findByIdIntegrationTest() throws Exception {
         LocalUser localUserExpected = localUser1;
         mockMvc.perform(get("/localUser/" + localUserExpected.getId()))
                 .andDo(print())
@@ -116,22 +137,75 @@ public class LocalUserIntegrationTest {
                         status().isOk(),
                         content().json(objectMapper.writeValueAsString(localUserExpected))
                 );
-
     }
 
     @Test
-    void update() throws Exception {
+    void createIntegrationTest() throws Exception {
 
-        LocalUser localUserExpected = localUser1;
-        localUser1.setEmail("hans.mueller25@example.de");
-        localUser1.setPassword("password_1_new");
+        LocalUser localUserExpected = new LocalUser(
+                null,
+                "Sofia",
+                "Nowak",
+                "sofia.nowak@example.pl",
+                "password_4",
+                "ul. Marszałkowska 10, 00-590 Warszawa, Poland"
+        );
 
         mockMvc.perform(post("/localUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(localUserExpected)))
                 .andDo(print())
                 .andExpectAll(
-                        status().isOk(),
-                        content().json(objectMapper.writeValueAsString(localUserExpected))
+                        status().isAccepted(),
+                        jsonPath("$.id").exists(),
+                        jsonPath("$.name").value(localUserExpected.getName()),
+                        jsonPath("$.surname").value(localUserExpected.getSurname())
+                );
+    }
+
+    @Test
+    void updateIntegrationTest() throws Exception {
+
+        LocalUser localUserExpected = new LocalUser(
+                null,
+                "Carlos",
+                "García",
+                "carlos.garcia@example.es",
+                "password_6",
+                "Calle de Alcalá 45, 28014 Madrid, Spain"
+        );
+
+        mockMvc.perform(put("/localUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(localUserExpected)))
+                .andDo(print())
+                .andExpectAll(
+                        status().isAccepted(),
+                        jsonPath("$.id").exists(),
+                        jsonPath("$.name").value(localUserExpected.getName()),
+                        jsonPath("$.surname").value(localUserExpected.getSurname()),
+                        jsonPath("$.email").value(localUserExpected.getEmail()),
+                        jsonPath("$.password").value(localUserExpected.getPassword()),
+                        jsonPath("$.postAddress").value(localUserExpected.getPostAddress())
+                );
+
+        localUserExpected.setEmail("carlos.garcia25@example.es");
+
+        mockMvc.perform(put("/localUser")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(localUserExpected)))
+                .andDo(print())
+                .andExpectAll(
+                        status().isAccepted(),
+                        jsonPath("$.id").exists(),
+                        jsonPath("$.name").value(localUserExpected.getName()),
+                        jsonPath("$.surname").value(localUserExpected.getSurname()),
+                        jsonPath("$.email").value(localUserExpected.getEmail()),
+                        jsonPath("$.password").value(localUserExpected.getPassword()),
+                        jsonPath("$.postAddress").value(localUserExpected.getPostAddress())
                 );
     }
 }
