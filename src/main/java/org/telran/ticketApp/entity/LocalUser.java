@@ -18,7 +18,7 @@ public class LocalUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY) //                              AUTO - сквозная нумерация по всем таблицам
     @EqualsAndHashCode.Include
     @ToString.Include
-    private  Long id;
+    private Long id;
 
     private String name;
 

@@ -1,6 +1,7 @@
 package org.telran.ticketApp.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telran.ticketApp.entity.LocalUser;
 import org.telran.ticketApp.exception.LocalUserNotFoundException;
