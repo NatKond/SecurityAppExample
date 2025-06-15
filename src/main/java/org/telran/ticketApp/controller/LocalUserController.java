@@ -1,11 +1,11 @@
 package org.telran.ticketApp.controller;
 
-import jdk.jshell.Snippet;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.telran.ticketApp.entity.LocalUser;
+import org.telran.ticketApp.exception.LocalUserNotFoundException;
 import org.telran.ticketApp.service.LocalUserService;
 
 @RestController
@@ -38,5 +38,10 @@ public class LocalUserController {
     @DeleteMapping("/{id}")
     public void deleteLocalUser(@PathVariable Long id) {
         localUserService.deleteById(id);
+    }
+
+    @ExceptionHandler(LocalUserNotFoundException.class)
+    public ResponseEntity<String> handlerLocalUserNotFoundException(LocalUserNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product controller: " + exception.getMessage());
     }
 }

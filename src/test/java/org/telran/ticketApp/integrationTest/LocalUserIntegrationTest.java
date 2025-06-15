@@ -1,6 +1,7 @@
 package org.telran.ticketApp.integrationTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.AfterEach;
@@ -16,12 +17,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.telran.ticketApp.entity.LocalUser;
 import org.telran.ticketApp.repository.LocalUserRepository;
 
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -30,24 +33,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SpringBootTest
-//@TestPropertySource("classpath:application-test.properties")
-//@DirtiesContext
-@ActiveProfiles("test")
+@TestPropertySource("classpath:application-test.properties") //@ActiveProfiles("test")
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) //перезапускает контекст (в т.ч. базу данных) после каждого теста
+@Transactional // Spring откатывает транзакцию после каждого теста
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 public class LocalUserIntegrationTest {
     @Autowired
     MockMvc mockMvc;
 
-    //@MockitoBean для теста с мок-объектом вместо localUserRepository
-    @Autowired
-    LocalUserRepository localUserRepository;
+//    @MockitoBean // тесты с мок-объектом вместо localUserRepository
+//    @Autowired
+//    LocalUserRepository localUserRepository;
 
     @Autowired
     ObjectMapper objectMapper;
 
-    static LocalUser localUser1;
-    static LocalUser localUser2;
-    static LocalUser localUser3;
+    LocalUser localUser1;
+    LocalUser localUser2;
+    LocalUser localUser3;
+    LocalUser localUser4;
 
     @BeforeEach
     void init() {
@@ -60,7 +64,6 @@ public class LocalUserIntegrationTest {
                 "password_1",
                 "Berliner Str. 55, 10115 Berlin, Germany"
         );
-
         localUser2 = new LocalUser(
                 2L,
                 //null,
@@ -70,7 +73,6 @@ public class LocalUserIntegrationTest {
                 "password_2",
                 "12 Rue de Rivoli, 75001 Paris, France"
         );
-
         localUser3 = new LocalUser(
                 3L,
                 //null,
@@ -81,49 +83,41 @@ public class LocalUserIntegrationTest {
                 "Via Roma 1, 00100 Roma, Italy"
         );
 
-        //        localUserRepository.saveAll(List.of(localUser1, localUser2, localUser3));
+        localUser4 = new LocalUser(
+                4L,
+                //null,
+                "Carlos",
+                "García",
+                "carlos.garcia@example.es",
+                "password_4",
+                "Calle de Alcalá 45, 28014 Madrid, Spain"
+        );
+//        localUser1 = localUserRepository.save(localUser1);
+//        localUser2 = localUserRepository.save(localUser2);
+//        localUser3 = localUserRepository.save(localUser3);
+//        localUser4 = localUserRepository.save(localUser4);
     }
 
 //    @AfterEach
 //    void tearDown() {
-//        localUserRepository.deleteAll(List.of(localUser1, localUser2, localUser3));
+//        localUserRepository.deleteAll();
 //    }
 
 
     @Test
     void findAllIntegrationTest() throws Exception {
-        List<LocalUser> localUserListExpected = List.of(localUser1, localUser2, localUser3);
+        List<LocalUser> localUserListExpected = List.of(localUser1, localUser2, localUser3, localUser4);
 
         //when(localUserRepositoryMock.findAll()).thenReturn(localUserListExpected);
         mockMvc.perform(get("/localUser"))
                 .andDo(print())
                 .andExpectAll(
                         status().isOk(),
-                        jsonPath("$[*].id", hasItems(
-                                localUser1.getId().intValue(),
-                                localUser2.getId().intValue(),
-                                localUser3.getId().intValue())),
-                        jsonPath("$[*].name", hasItems(
-                                localUser1.getName(),
-                                localUser1.getName(),
-                                localUser2.getName())),
-                        jsonPath("$[*].surname", hasItems(
-                                localUser1.getSurname(),
-                                localUser1.getSurname(),
-                                localUser2.getSurname())),
-                        jsonPath("$[*].email", hasItems(
-                                localUser1.getEmail(),
-                                localUser1.getEmail(),
-                                localUser2.getEmail())),
-                        jsonPath("$[*].password", hasItems(
-                                localUser1.getPassword(),
-                                localUser1.getPassword(),
-                                localUser2.getPassword())),
-                        jsonPath("$[*].postAddress", hasItems(
-                                localUser1.getPostAddress(),
-                                localUser1.getPostAddress(),
-                                localUser2.getPostAddress()
-                        )));
+                        content().json(objectMapper.writeValueAsString(localUserListExpected)));
+//                        jsonPath("$[*].id", hasItems(
+//                                localUser1.getId().intValue(),
+//                                localUser2.getId().intValue(),
+//                                localUser3.getId().intValue())));
 
         //verify(localUserRepositoryMock).findAll();
     }
@@ -131,7 +125,7 @@ public class LocalUserIntegrationTest {
     @Test
     void findByIdIntegrationTest() throws Exception {
         LocalUser localUserExpected = localUser1;
-        mockMvc.perform(get("/localUser/" + localUserExpected.getId()))
+        mockMvc.perform(get("/localUser/"+ localUserExpected.getId()))
                 .andDo(print())
                 .andExpectAll(
                         status().isOk(),
@@ -153,7 +147,6 @@ public class LocalUserIntegrationTest {
 
         mockMvc.perform(post("/localUser")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(localUserExpected)))
                 .andDo(print())
                 .andExpectAll(
@@ -167,18 +160,13 @@ public class LocalUserIntegrationTest {
     @Test
     void updateIntegrationTest() throws Exception {
 
-        LocalUser localUserExpected = new LocalUser(
-                null,
-                "Carlos",
-                "García",
-                "carlos.garcia@example.es",
-                "password_6",
-                "Calle de Alcalá 45, 28014 Madrid, Spain"
-        );
+        LocalUser localUserExpected = localUser1;
+
+        localUserExpected.setEmail("hans.mueller25@example.de");
+        localUserExpected.setPassword("password_1_new");
 
         mockMvc.perform(put("/localUser")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(localUserExpected)))
                 .andDo(print())
                 .andExpectAll(
@@ -187,25 +175,18 @@ public class LocalUserIntegrationTest {
                         jsonPath("$.name").value(localUserExpected.getName()),
                         jsonPath("$.surname").value(localUserExpected.getSurname()),
                         jsonPath("$.email").value(localUserExpected.getEmail()),
-                        jsonPath("$.password").value(localUserExpected.getPassword()),
-                        jsonPath("$.postAddress").value(localUserExpected.getPostAddress())
+                        jsonPath("$.password").value(localUserExpected.getPassword())
                 );
+    }
 
-        localUserExpected.setEmail("carlos.garcia25@example.es");
-
-        mockMvc.perform(put("/localUser")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(localUserExpected)))
+    @Test
+    void deleteIntegrationTest() throws Exception {
+        mockMvc.perform(delete("/localUser/" + localUser1.getId()))
                 .andDo(print())
-                .andExpectAll(
-                        status().isAccepted(),
-                        jsonPath("$.id").exists(),
-                        jsonPath("$.name").value(localUserExpected.getName()),
-                        jsonPath("$.surname").value(localUserExpected.getSurname()),
-                        jsonPath("$.email").value(localUserExpected.getEmail()),
-                        jsonPath("$.password").value(localUserExpected.getPassword()),
-                        jsonPath("$.postAddress").value(localUserExpected.getPostAddress())
-                );
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/localUser/" + localUser1.getId()))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 }
