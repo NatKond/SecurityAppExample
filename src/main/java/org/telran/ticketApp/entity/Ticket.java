@@ -1,5 +1,7 @@
 package org.telran.ticketApp.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,16 +10,15 @@ import lombok.*;
 @NoArgsConstructor
 @Setter
 @Getter
-@EqualsAndHashCode
 @ToString
 @Builder
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    @ToString.Include
     private Long id;
 
     @Column
@@ -25,4 +26,10 @@ public class Ticket {
 
     @Column
     private Double price;
+
+    @ManyToOne
+    @JoinColumn(name = "local_user_id")
+    @JsonBackReference
+    @ToString.Exclude
+    private LocalUser localUser;
 }

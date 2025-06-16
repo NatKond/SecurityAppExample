@@ -10,6 +10,8 @@ public interface TicketService {
 
     Ticket getTicketById(int id);
 
+    Ticket getByTitle(String title);
+
     Ticket createTicket(Ticket ticket);
 
     Ticket updateTicket(Ticket ticket);

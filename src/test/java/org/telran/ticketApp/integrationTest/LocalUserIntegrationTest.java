@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.processing.SQL;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,24 +17,33 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.telran.ticketApp.entity.LocalUser;
+import org.telran.ticketApp.entity.Ticket;
 import org.telran.ticketApp.repository.LocalUserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SpringBootTest
-@TestPropertySource("classpath:application-test.properties") //@ActiveProfiles("test")
+@ActiveProfiles("test")
+//@TestPropertySource("/application-test.properties")
+//@Sql("/data.sql")
+//@Sql(scripts = "/data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+//@Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 //@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) //перезапускает контекст (в т.ч. базу данных) после каждого теста
 @Transactional // Spring откатывает транзакцию после каждого теста
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
@@ -62,7 +72,8 @@ public class LocalUserIntegrationTest {
                 "Müller",
                 "hans.mueller@example.de",
                 "password_1",
-                "Berliner Str. 55, 10115 Berlin, Germany"
+                "Berliner Str. 55, 10115 Berlin, Germany",
+                new ArrayList<>()
         );
         localUser2 = new LocalUser(
                 2L,
@@ -71,7 +82,8 @@ public class LocalUserIntegrationTest {
                 "Dubois",
                 "emilieDubois@example.fr",
                 "password_2",
-                "12 Rue de Rivoli, 75001 Paris, France"
+                "12 Rue de Rivoli, 75001 Paris, France",
+                new ArrayList<>()
         );
         localUser3 = new LocalUser(
                 3L,
@@ -80,7 +92,8 @@ public class LocalUserIntegrationTest {
                 "Rossi",
                 "luca_rossi@example.it",
                 "password_3",
-                "Via Roma 1, 00100 Roma, Italy"
+                "Via Roma 1, 00100 Roma, Italy",
+                new ArrayList<>()
         );
 
         localUser4 = new LocalUser(
@@ -90,7 +103,8 @@ public class LocalUserIntegrationTest {
                 "García",
                 "carlos.garcia@example.es",
                 "password_4",
-                "Calle de Alcalá 45, 28014 Madrid, Spain"
+                "Calle de Alcalá 45, 28014 Madrid, Spain",
+                new ArrayList<>()
         );
 //        localUser1 = localUserRepository.save(localUser1);
 //        localUser2 = localUserRepository.save(localUser2);
@@ -103,7 +117,6 @@ public class LocalUserIntegrationTest {
 //        localUserRepository.deleteAll();
 //    }
 
-
     @Test
     void findAllIntegrationTest() throws Exception {
         List<LocalUser> localUserListExpected = List.of(localUser1, localUser2, localUser3, localUser4);
@@ -114,10 +127,10 @@ public class LocalUserIntegrationTest {
                 .andExpectAll(
                         status().isOk(),
                         content().json(objectMapper.writeValueAsString(localUserListExpected)));
-//                        jsonPath("$[*].id", hasItems(
-//                                localUser1.getId().intValue(),
-//                                localUser2.getId().intValue(),
-//                                localUser3.getId().intValue())));
+//                        jsonPath("$[*].name", hasItems(
+//                                localUser1.getName(),
+//                                localUser2.getName(),
+//                                localUser3.getName())));
 
         //verify(localUserRepositoryMock).findAll();
     }
@@ -142,7 +155,8 @@ public class LocalUserIntegrationTest {
                 "Nowak",
                 "sofia.nowak@example.pl",
                 "password_4",
-                "ul. Marszałkowska 10, 00-590 Warszawa, Poland"
+                "ul. Marszałkowska 10, 00-590 Warszawa, Poland",
+                new ArrayList<>()
         );
 
         mockMvc.perform(post("/localUser")

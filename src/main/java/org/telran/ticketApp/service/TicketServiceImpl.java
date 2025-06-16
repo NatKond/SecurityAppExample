@@ -25,6 +25,11 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public Ticket getByTitle(String title) {
+        return ticketRepository.findByTitle(title);
+    }
+
+    @Override
     public Ticket createTicket(Ticket ticket) {
         return ticketRepository.save(ticket);
     }

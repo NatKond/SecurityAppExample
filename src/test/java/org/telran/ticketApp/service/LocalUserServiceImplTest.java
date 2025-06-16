@@ -43,7 +43,8 @@ class LocalUserServiceImplTest {
                 "Müller",
                 "hans.mueller@example.de",
                 "EQKNTMpdmzihisss4gp8",
-                "Berliner Str. 55, 10115 Berlin, Germany"
+                "Berliner Str. 55, 10115 Berlin, Germany",
+                null
         );
 
         localUser2 = new LocalUser(
@@ -52,7 +53,8 @@ class LocalUserServiceImplTest {
                 "Dubois",
                 "emilieDubois@example.fr",
                 "t4HbG8u6X9oWHPed348q",
-                "12 Rue de Rivoli, 75001 Paris, France"
+                "12 Rue de Rivoli, 75001 Paris, France",
+                null
         );
 
         localUser3 = new LocalUser(
@@ -61,7 +63,8 @@ class LocalUserServiceImplTest {
                 "Rossi",
                 "luca_rossi@example.it",
                 "dgtwz7xj644og7oemdc4",
-                "Via Roma 1, 00100 Roma, Italy"
+                "Via Roma 1, 00100 Roma, Italy",
+                null
         );
     }
 
