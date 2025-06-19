@@ -25,6 +25,7 @@ import org.telran.ticketApp.entity.Ticket;
 import org.telran.ticketApp.repository.LocalUserRepository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItems;
@@ -73,7 +74,7 @@ public class LocalUserIntegrationTest {
                 "hans.mueller@example.de",
                 "password_1",
                 "Berliner Str. 55, 10115 Berlin, Germany",
-                new ArrayList<>()
+                new HashSet<>()
         );
         localUser2 = new LocalUser(
                 2L,
@@ -83,7 +84,7 @@ public class LocalUserIntegrationTest {
                 "emilieDubois@example.fr",
                 "password_2",
                 "12 Rue de Rivoli, 75001 Paris, France",
-                new ArrayList<>()
+                new HashSet<>()
         );
         localUser3 = new LocalUser(
                 3L,
@@ -93,7 +94,7 @@ public class LocalUserIntegrationTest {
                 "luca_rossi@example.it",
                 "password_3",
                 "Via Roma 1, 00100 Roma, Italy",
-                new ArrayList<>()
+                new HashSet<>()
         );
 
         localUser4 = new LocalUser(
@@ -104,7 +105,7 @@ public class LocalUserIntegrationTest {
                 "carlos.garcia@example.es",
                 "password_4",
                 "Calle de Alcalá 45, 28014 Madrid, Spain",
-                new ArrayList<>()
+                new HashSet<>()
         );
 //        localUser1 = localUserRepository.save(localUser1);
 //        localUser2 = localUserRepository.save(localUser2);
@@ -156,7 +157,7 @@ public class LocalUserIntegrationTest {
                 "sofia.nowak@example.pl",
                 "password_4",
                 "ul. Marszałkowska 10, 00-590 Warszawa, Poland",
-                new ArrayList<>()
+                new HashSet<>()
         );
 
         mockMvc.perform(post("/localUser")

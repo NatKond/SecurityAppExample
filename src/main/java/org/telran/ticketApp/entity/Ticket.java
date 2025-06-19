@@ -13,7 +13,7 @@ import lombok.*;
 @ToString
 @Builder
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Ticket {
 
     @Id
@@ -27,7 +27,7 @@ public class Ticket {
     @Column
     private Double price;
 
-    @ManyToOne
+    @ManyToOne//(mappedBy = "" )
     @JoinColumn(name = "local_user_id")
     @JsonBackReference
     @ToString.Exclude

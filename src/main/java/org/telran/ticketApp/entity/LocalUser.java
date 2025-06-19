@@ -5,14 +5,15 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "local_users")
 @NoArgsConstructor
 @Setter
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 @Builder
 @AllArgsConstructor
@@ -33,8 +34,9 @@ public class LocalUser {
 
     private String postAddress; // post_address// postAddress
 
-    @OneToMany(mappedBy = "localUser")
+    @OneToMany(mappedBy = "localUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    //@JoinColumn(name = "local_user_id")
     @JsonManagedReference
     @ToString.Exclude
-    private List<Ticket> tickets;
+    private Set<Ticket> tickets = new HashSet<>();
 }
