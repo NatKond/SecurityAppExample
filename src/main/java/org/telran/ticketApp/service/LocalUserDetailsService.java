@@ -14,6 +14,6 @@ public class LocalUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new User(username, "12345", Collections.singleton(new SimpleGrantedAuthority("CLIENT")));
+        return new User(username, "12345", Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
     }
 }

@@ -37,10 +37,12 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SpringBootTest
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
 //@TestPropertySource("/application-test.properties")
 //@Sql("/data.sql")
 //@Sql(scripts = "/data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -123,7 +125,8 @@ public class LocalUserIntegrationTest {
         List<LocalUser> localUserListExpected = List.of(localUser1, localUser2, localUser3, localUser4);
 
         //when(localUserRepositoryMock.findAll()).thenReturn(localUserListExpected);
-        mockMvc.perform(get("/localUser"))
+        mockMvc.perform(get("/users")
+                .with(httpBasic("alex", "12345")))
                 .andDo(print())
                 .andExpectAll(
                         status().isOk(),
@@ -139,7 +142,8 @@ public class LocalUserIntegrationTest {
     @Test
     void findByIdIntegrationTest() throws Exception {
         LocalUser localUserExpected = localUser1;
-        mockMvc.perform(get("/localUser/"+ localUserExpected.getId()))
+        mockMvc.perform(get("/users/"+ localUserExpected.getId())
+                .with(httpBasic("alex", "12345")))
                 .andDo(print())
                 .andExpectAll(
                         status().isOk(),
@@ -160,9 +164,10 @@ public class LocalUserIntegrationTest {
                 new HashSet<>()
         );
 
-        mockMvc.perform(post("/localUser")
+        mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(localUserExpected)))
+                        .content(objectMapper.writeValueAsString(localUserExpected))
+                        .with(httpBasic("alex", "12345")))
                 .andDo(print())
                 .andExpectAll(
                         status().isAccepted(),
@@ -180,9 +185,10 @@ public class LocalUserIntegrationTest {
         localUserExpected.setEmail("hans.mueller25@example.de");
         localUserExpected.setPassword("password_1_new");
 
-        mockMvc.perform(put("/localUser")
+        mockMvc.perform(put("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(localUserExpected)))
+                        .content(objectMapper.writeValueAsString(localUserExpected))
+                        .with(httpBasic("alex", "12345")))
                 .andDo(print())
                 .andExpectAll(
                         status().isAccepted(),
@@ -196,11 +202,13 @@ public class LocalUserIntegrationTest {
 
     @Test
     void deleteIntegrationTest() throws Exception {
-        mockMvc.perform(delete("/localUser/" + localUser1.getId()))
+        mockMvc.perform(delete("/users/" + localUser1.getId())
+                        .with(httpBasic("alex", "12345")))
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/localUser/" + localUser1.getId()))
+        mockMvc.perform(get("/users/" + localUser1.getId())
+                        .with(httpBasic("alex", "12345")))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }

@@ -21,8 +21,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
                         request
-                                .requestMatchers("localUser").authenticated()
-                                .requestMatchers("tickets").authenticated()
+                                .requestMatchers("/users").authenticated()
+                                .requestMatchers("/tickets").authenticated()
                                 .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults()) // аутентификация по логину и паролю
                 .sessionManagement(session -> session

@@ -9,7 +9,7 @@ import org.telran.ticketApp.service.TicketService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/ticket")
+@RequestMapping("/tickets")
 @RequiredArgsConstructor
 public class TicketController {
 

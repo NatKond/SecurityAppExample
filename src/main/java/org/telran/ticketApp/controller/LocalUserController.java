@@ -11,7 +11,7 @@ import org.telran.ticketApp.service.LocalUserService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/localUser")
+@RequestMapping(value = "/users")
 @RequiredArgsConstructor
 public class LocalUserController {
 
