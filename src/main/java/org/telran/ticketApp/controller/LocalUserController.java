@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.telran.ticketApp.converter.Converter;
+import org.telran.ticketApp.dto.CreateUserRequestDto;
+import org.telran.ticketApp.dto.UserResponseDto;
 import org.telran.ticketApp.entity.LocalUser;
 import org.telran.ticketApp.exception.LocalUserNotFoundException;
 import org.telran.ticketApp.service.LocalUserService;
@@ -16,6 +19,8 @@ import java.util.List;
 public class LocalUserController {
 
     private final LocalUserService localUserService;
+
+    private final Converter<LocalUser, CreateUserRequestDto, UserResponseDto> converter;
 
     @GetMapping
     public Iterable<LocalUser> getAllLocalUsers() {
@@ -30,13 +35,17 @@ public class LocalUserController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<LocalUser> createLocalUser(@RequestBody LocalUser localUser) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(localUserService.save(localUser));
+    public ResponseEntity<UserResponseDto> createLocalUser(@RequestBody CreateUserRequestDto createUserRequestDto) {
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        converter.convertEntityToDto(
+                                localUserService.save(
+                                        converter.convertDtoToEntity(createUserRequestDto))));
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<LocalUser> updateLocalUser(@RequestBody LocalUser localUser) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(localUserService.update(localUser));
     }
