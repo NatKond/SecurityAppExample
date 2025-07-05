@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/users")
 @RequiredArgsConstructor
-public class LocalUserController {
+public class LocalUserController implements LocalUserControllerInt {
 
     private final LocalUserService localUserService;
 

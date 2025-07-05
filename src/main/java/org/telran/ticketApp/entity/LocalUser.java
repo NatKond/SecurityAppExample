@@ -1,10 +1,9 @@
 package org.telran.ticketApp.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-import org.telran.ticketApp.enums.ROLE;
+import org.telran.ticketApp.enums.Role;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -37,7 +36,7 @@ public class LocalUser {
     private String postAddress; // post_address// postAddress
 
     @Enumerated(EnumType.STRING) // хранит енам как строку, если ее не будет, то енам будет храниться как число
-    private ROLE role = ROLE.ROLE_USER;
+    private Role role = Role.ROLE_USER;
 
     @OneToMany(mappedBy = "localUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     //@JoinColumn(name = "local_user_id")

@@ -1,0 +1,332 @@
+openapi: 3.0.3
+info:
+  title: Онлайн-магазин товаров для дома и сада
+  version: 1.0.0
+  description: REST API для управления пользователями, товарами, заказами и корзиной.
+
+
+  servers:
+    - url: http://localhost:8081/swagger-ui/index.html#/
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserRegister:
+      type: object
+      required: [name, email, phone, password]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        password:
+          type: string
+
+    Product:
+      type: object
+      required: [name, description, price, category]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        category:
+          type: string
+        image:
+          type: string
+
+    Category:
+      type: object
+      required: [category]
+      properties:
+        category:
+          type: string
+
+    CartItem:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId:
+          type: string
+        quantity:
+          type: integer
+
+    OrderItem:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId:
+          type: string
+        quantity:
+          type: integer
+
+    OrderCreate:
+      type: object
+      required: [items, deliveryAddress, deliveryMethod]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        deliveryAddress:
+          type: string
+        deliveryMethod:
+          type: string
+
+paths:
+
+  /users/register:
+    post:
+      summary: Регистрация пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+      responses:
+        '201':
+          description: Успешная регистрация
+        '400':
+          description: Ошибка запроса
+
+  /users/login:
+    post:
+      summary: Аутентификация пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Успешный вход
+        '401':
+          description: Неверные учетные данные
+
+  /users/{userId}:
+    put:
+      summary: Редактирование профиля
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+      responses:
+        '200': { description: OK }
+        '400': { description: Неверный запрос }
+        '404': { description: Не найдено }
+
+    delete:
+      summary: Удаление пользователя
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': { description: Успешно }
+        '404': { description: Не найдено }
+
+  /products:
+    get:
+      summary: Получение списка товаров
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: minPrice
+          schema:
+            type: number
+        - in: query
+          name: maxPrice
+          schema:
+            type: number
+        - in: query
+          name: discount
+          schema:
+            type: boolean
+        - in: query
+          name: sort
+          schema:
+            type: string
+      responses:
+        '200': { description: OK }
+
+    post:
+      summary: Добавление товара (админ)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201': { description: Создано }
+        '400': { description: Ошибка запроса }
+
+  /products/{productId}:
+    get:
+      summary: Получение информации о товаре
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': { description: OK }
+        '404': { description: Не найдено }
+
+    put:
+      summary: Обновление товара
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200': { description: OK }
+
+    delete:
+      summary: Удаление товара
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': { description: OK }
+
+  /categories:
+    get:
+      summary: Получение категорий
+      responses:
+        '200': { description: OK }
+
+    post:
+      summary: Добавление категории
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '201': { description: Создано }
+
+  /categories/{categoryId}:
+    put:
+      summary: Обновление категории
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '200': { description: OK }
+
+    delete:
+      summary: Удаление категории
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': { description: OK }
+
+  /cart:
+    post:
+      summary: Добавление в корзину
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItem'
+      responses:
+        '200': { description: OK }
+
+  /orders:
+    post:
+      summary: Создание заказа
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreate'
+      responses:
+        '201': { description: Заказ создан }
+
+  /orders/{orderId}:
+    get:
+      summary: Статус заказа
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': { description: OK }
+
+  /orders/history:
+    get:
+      summary: История заказов пользователя
+      security:
+        - BearerAuth: []
+      responses:
+        '200': { description: OK }
+
+  /favorites:
+    get:
+      summary: Избранные товары
+      security:
+        - BearerAuth: []
+      responses:
+        '200': { description: OK }

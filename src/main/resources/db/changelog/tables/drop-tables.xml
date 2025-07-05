@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="nkond" id="1-drop-table-local-tickets" runAlways="true">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="tickets"/>
+        </preConditions>
+        <dropTable cascadeConstraints="true" tableName="tickets"/>
+    </changeSet>
+
+    <changeSet author="nkond" id="2-drop-table-local-users" runAlways="true">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="local_users"/>
+        </preConditions>
+        <dropTable cascadeConstraints="true" tableName="local_users"/>
+    </changeSet>
+
+</databaseChangeLog>

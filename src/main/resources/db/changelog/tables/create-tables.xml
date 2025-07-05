@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="3-create table-local_users" author="nkond">
+        <createTable tableName="local_users" >
+            <column name="id" type="BIGINT UNSIGNED" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_local_users" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="surname" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="post_address" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="4-add-column-role" author="nkond">
+        <addColumn tableName="local_users">
+            <column name="role" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="5-create table-tickets" author="nkond">
+        <sql>
+            CREATE TABLE tickets
+            (
+                id              INT PRIMARY KEY AUTO_INCREMENT,
+                title           VARCHAR(255) NOT NULL,
+                price           VARCHAR(255) NOT NULL,
+                local_user_id   BIGINT UNSIGNED NOT NULL
+                );
+        </sql>
+    </changeSet>
+
+    <changeSet id="6-create connection" author="nkond">
+        <addForeignKeyConstraint baseColumnNames="local_user_id" baseTableName="tickets"
+                                 constraintName="FK_TICKETS_ON_LOCAL_USER" referencedColumnNames="id"
+                                 referencedTableName="local_users"/>
+    </changeSet>
+
+</databaseChangeLog>

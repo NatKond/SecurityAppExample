@@ -1,9 +1,7 @@
 package org.telran.ticketApp.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.telran.ticketApp.entity.LocalUser;
+import org.telran.ticketApp.enums.Role;
 import org.telran.ticketApp.repository.LocalUserRepository;
 
 import java.util.List;
@@ -44,6 +43,7 @@ class LocalUserServiceImplTest {
                 "hans.mueller@example.de",
                 "EQKNTMpdmzihisss4gp8",
                 "Berliner Str. 55, 10115 Berlin, Germany",
+                Role.ROLE_USER,
                 null
         );
 
@@ -54,6 +54,7 @@ class LocalUserServiceImplTest {
                 "emilieDubois@example.fr",
                 "t4HbG8u6X9oWHPed348q",
                 "12 Rue de Rivoli, 75001 Paris, France",
+                Role.ROLE_USER,
                 null
         );
 
@@ -64,6 +65,7 @@ class LocalUserServiceImplTest {
                 "luca_rossi@example.it",
                 "dgtwz7xj644og7oemdc4",
                 "Via Roma 1, 00100 Roma, Italy",
+                Role.ROLE_USER,
                 null
         );
     }

@@ -1,13 +1,12 @@
 package org.telran.ticketApp.converter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.telran.ticketApp.dto.CreateUserRequestDto;
 import org.telran.ticketApp.dto.UserResponseDto;
 import org.telran.ticketApp.entity.LocalUser;
-import org.telran.ticketApp.enums.ROLE;
+import org.telran.ticketApp.enums.Role;
 
 @Component
 public class UserConverter implements Converter<LocalUser, CreateUserRequestDto, UserResponseDto> {
@@ -24,7 +23,7 @@ public class UserConverter implements Converter<LocalUser, CreateUserRequestDto,
                 .password(passwordEncoder.encode(createUserRequestDto.password()))
                 .postAddress(createUserRequestDto.postAddress())
                 .tickets(createUserRequestDto.tickets())
-                .role(ROLE.ROLE_USER)
+                .role(Role.ROLE_USER)
                 .build();
     }
 
